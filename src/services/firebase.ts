@@ -14,6 +14,7 @@ import {
     GoogleAuthProvider,
     signOut,
 } from 'firebase/auth';
+import { UserStore } from '../stores/userStore';
 
 const firebaseConfig = {
     apiKey: PUBLIC_FIREBASE_API_KEY,
@@ -31,6 +32,11 @@ provider.setCustomParameters({ prompt: 'select_account',  });
 
 export const firebaseAuth = getAuth();
 export const logOut = () => signOut(firebaseAuth);
+firebaseAuth.languageCode = 'de-AT';
+UserStore.set(firebaseAuth.currentUser);
+firebaseAuth.onAuthStateChanged((user) => {
+    UserStore.set(user);
+});
 export const authProviders = [
     {
         provider: EmailAuthProvider.PROVIDER_ID,

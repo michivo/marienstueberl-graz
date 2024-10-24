@@ -3,25 +3,30 @@
 	import { authProviders, firebaseAuth } from '../services/firebase';
 	import { browser } from '$app/environment';
 
+	let firebaseUi = undefined as undefined | any;
+
 	onMount(async () => {
 		const firebaseUi = await firebaseAuthUi();
 		if (firebaseUi) {
 			firebaseUi.start('#firebaseui-auth-container', {
-				signInOptions: authProviders
+				signInOptions: authProviders,
+				signInSuccessUrl: '/welcome' 
 			});
 		}
 	});
 
 	async function firebaseAuthUi() {
-		if (browser) {
-            const firebaseui = await import("firebaseui");
-			return new firebaseui.auth.AuthUI(firebaseAuth);
+		if (browser && !firebaseUi) {
+            const firebaseui = await import('firebaseui');
+			firebaseUi = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(firebaseAuth);
 		}
-		return undefined;
+		return firebaseUi;
 	}
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
 <div id="firebaseui-auth-container"></div>
-This is sad.
+
+<style lang="scss">
+	@import '/css/firebase-ui.css';
+</style>
+
