@@ -10,7 +10,7 @@
 		if (firebaseUi) {
 			firebaseUi.start('#firebaseui-auth-container', {
 				signInOptions: authProviders,
-				signInSuccessUrl: '/welcome' 
+				signInSuccessUrl: '/admin' 
 			});
 		}
 	});
