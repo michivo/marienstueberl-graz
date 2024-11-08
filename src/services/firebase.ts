@@ -19,6 +19,7 @@ import { currentUser } from '../stores/currentUser';
 import { getFirestore } from 'firebase/firestore';
 import { doc, getDoc } from "firebase/firestore";
 import type { UserRole } from "../types/userInfo";
+import { goto } from '$app/navigation';
 
 const firebaseConfig = {
     apiKey: PUBLIC_FIREBASE_API_KEY,
@@ -35,8 +36,13 @@ export const provider = new GoogleAuthProvider();
 provider.setCustomParameters({ prompt: 'select_account', });
 
 export const firebaseAuth = getAuth();
-export const logOut = () => signOut(firebaseAuth);
-firebaseAuth.languageCode = 'de-AT';
+export async function logOut(): Promise<void> {
+    currentUser.set(undefined);
+    await signOut(firebaseAuth);
+    goto('/');
+}
+
+firebaseAuth.languageCode = 'de';
 
 await updateUser(firebaseAuth.currentUser);
 firebaseAuth.onAuthStateChanged(async (user) => {
@@ -48,7 +54,6 @@ export const authProviders = [
         provider: EmailAuthProvider.PROVIDER_ID,
         requireDisplayName: true,
     },
-    GoogleAuthProvider.PROVIDER_ID,
 ];
 
 export const firebaseDb = getFirestore();
