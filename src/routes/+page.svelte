@@ -2,6 +2,9 @@
 	import { onMount } from 'svelte';
 	import { authProviders, firebaseAuth } from '../services/firebase';
 	import { browser } from '$app/environment';
+	import { currentUser } from '../stores/currentUser';
+	import { goto } from '$app/navigation';
+	import Spinner from '../components/misc/Spinner.svelte';
 
 	let firebaseUi = undefined as undefined | any;
 
@@ -10,8 +13,13 @@
 		if (firebaseUi) {
 			firebaseUi.start('#firebaseui-auth-container', {
 				signInOptions: authProviders,
-				signInSuccessUrl: '/welcome' 
 			});
+		}
+	});
+
+	currentUser.subscribe((value) => {
+		if (value) {
+			goto('/admin');
 		}
 	});
 
@@ -24,9 +32,30 @@
 	}
 </script>
 
-<div id="firebaseui-auth-container"></div>
+<div class="landing-content">
+{#if $currentUser === undefined}
+	<div>Lade...</div>
+	<Spinner />
+{:else if $currentUser === null}
+	<div id="firebaseui-auth-container"></div>
+{/if}
+</div>
 
 <style lang="scss">
 	@import '/css/firebase-ui.css';
+
+	.landing-content {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		height: 100vh;
+		gap: 2rem;
+
+		div {
+			width: 30rem;
+			max-width: 100%;
+		}
+	}
 </style>
 

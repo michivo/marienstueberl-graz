@@ -9,7 +9,7 @@
 		const urlParams = new URLSearchParams(window.location.search);
 		const baseUrl = window.location.origin;
 		state = (urlParams.get('state') as 'valid' | 'invalid' | 'upcoming') || 'valid';
-		data = baseUrl + '/handout/' + state;
+		data = baseUrl + '/handout/' + state + '.html';
         console.error(state);
 	});
 </script>
@@ -102,7 +102,7 @@
 
     .qr-code-container {
         font-weight: lighter;
-        font-size: 0.9rem;
+        font-size: 0.75rem;
     }
 
 	.code-container {
