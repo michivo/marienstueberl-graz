@@ -11,6 +11,8 @@ import { onRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { initializeApp } from 'firebase-admin/app';
 import { auth } from 'firebase-admin';
+import { Request, Response } from 'express';
+import { DecodedIdToken } from 'firebase-admin/auth';
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
@@ -20,7 +22,7 @@ export const helloWorld = onRequest({ region: 'europe-west1', cors: ['*'] }, (_,
   response.send('Hello from Firebase!');
 });
 
-export const setIsAdmin = onRequest({ region: 'europe-west1', cors: ['*'] }, async (request, response) => {
+async function getToken(request: Request, response: Response): DecodedIdToken | undefined {
   if ((!request.headers.authorization || !request.headers.authorization.startsWith('Bearer ')) &&
     !(request.cookies && request.cookies.__session)) {
     logger.error('No Firebase ID token was passed as a Bearer token in the Authorization header.');
@@ -41,24 +43,21 @@ export const setIsAdmin = onRequest({ region: 'europe-west1', cors: ['*'] }, asy
     response.status(403).send('Unauthorized');
     return;
   }
+  initializeApp();
+  const decodedIdToken = await auth().verifyIdToken(idToken);
+  logger.log('ID Token correctly decoded', decodedIdToken);
+  return decodedIdToken;
+}
 
-  try {
-    initializeApp();
-    const decodedIdToken = await auth().verifyIdToken(idToken);
-    logger.log('ID Token correctly decoded', decodedIdToken);
-    if (decodedIdToken.admin === true) {
+export const setIsAdmin = onRequest({ region: 'europe-west1', cors: ['*'] }, async (request, response) => {
+  const decodedIdToken = await getToken(request, response);
+  if(decodedIdToken && decodedIdToken.admin) {
       await auth().setCustomUserClaims(decodedIdToken.uid, { admin: true });
       logger.log('Granted admin rights successfully', decodedIdToken);
       response.status(200).send('Success');
     }
     else {
       logger.error('User is not an admin', decodedIdToken);
-      response.status(403).send('Unauthorized');  
+      response.status(403).send('Unauthorized');
     }
-    return;
-  } catch (error) {
-    logger.error('Error while verifying Firebase ID token:', error);
-    response.status(403).send('Unauthorized');
-    return;
-  }
 });

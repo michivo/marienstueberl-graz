@@ -1,5 +1,29 @@
 <script>
-	import { firebaseAuth } from "../../services/firebase";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import { firebaseAuth } from "../../services/firebase";
 	import { currentUser } from "../../stores/currentUser";
 
 	async function makeMeAdmin() {
