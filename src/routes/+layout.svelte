@@ -1,18 +1,14 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { currentUser } from '../stores/currentUser';
 	import LoggedInHeader from '../components/headers/LoggedInHeader.svelte';
 	import EmptyHeader from '../components/headers/EmptyHeader.svelte';
 	import LoadingHeader from '../components/headers/LoadingHeader.svelte';
-
-    onMount(() => {
-    });
 </script>
 
 <div class="container">
-    {#if $currentUser}
+    {#if $currentUser.state === 'loggedIn'}
         <LoggedInHeader />
-    {:else if $currentUser === null}
+    {:else if $currentUser.state === 'loggedOut'}
          <EmptyHeader />
     {:else}
         <LoadingHeader />

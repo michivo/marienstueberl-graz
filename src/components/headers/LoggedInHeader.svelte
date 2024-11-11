@@ -4,7 +4,7 @@
 </script>
 
 <header>
-	<span>Angemeldet als <span class="username">{$currentUser?.displayName}</span></span>
+	<span>Angemeldet als <span class="username">{$currentUser.user?.displayName}</span></span>
 	<button on:click={async () => await logOut()}>Sign Out</button>
 </header>
 

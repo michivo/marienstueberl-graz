@@ -1,7 +1,8 @@
 import type { User } from 'firebase/auth';
 
-export type UserRole = 'admin' | 'client' | 'employee' | undefined;
+export type UserState = 'loggedIn' | 'loggedOut' | 'pending';
 
-export interface UserInfo extends User {
-    role: UserRole;
+export interface CurrentUser {
+    user?: User,
+    state: UserState,
 }

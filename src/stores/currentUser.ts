@@ -1,4 +1,4 @@
-import { writable } from "svelte/store";
-import type { UserInfo } from "../types/userInfo";
+import { writable } from 'svelte/store';
+import type { CurrentUser } from '../types/userInfo';
 
-export const currentUser = writable<UserInfo | null | undefined>(undefined);
+export const currentUser = writable<CurrentUser>({state: 'pending'});

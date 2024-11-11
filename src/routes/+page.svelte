@@ -18,7 +18,7 @@
 	});
 
 	currentUser.subscribe((value) => {
-		if (value) {
+		if (value.state === 'loggedIn') {
 			goto('/admin');
 		}
 	});
@@ -33,10 +33,10 @@
 </script>
 
 <div class="landing-content">
-{#if $currentUser === undefined}
+{#if $currentUser.state === 'pending'}
 	<div>Lade...</div>
 	<Spinner />
-{:else if $currentUser === null}
+{:else if $currentUser.state === 'loggedOut'}
 	<div id="firebaseui-auth-container"></div>
 {/if}
 </div>

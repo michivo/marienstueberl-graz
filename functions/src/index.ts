@@ -22,7 +22,7 @@ export const helloWorld = onRequest({ region: 'europe-west1', cors: ['*'] }, (_,
   response.send('Hello from Firebase!');
 });
 
-async function getToken(request: Request, response: Response): DecodedIdToken | undefined {
+async function getToken(request: Request, response: Response): Promise<DecodedIdToken | undefined> {
   if ((!request.headers.authorization || !request.headers.authorization.startsWith('Bearer ')) &&
     !(request.cookies && request.cookies.__session)) {
     logger.error('No Firebase ID token was passed as a Bearer token in the Authorization header.');
