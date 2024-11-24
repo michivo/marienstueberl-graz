@@ -109,5 +109,6 @@
 
     main {
         padding: 1rem;
+        width: 100%;
     }
 </style>
