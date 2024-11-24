@@ -19,7 +19,7 @@
 
 	currentUser.subscribe((value) => {
 		if (value.state === 'loggedIn') {
-			goto('/admin');
+			goto('/admin/clients');
 		}
 	});
 

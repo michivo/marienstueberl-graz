@@ -6,14 +6,20 @@
 </script>
 
 <div class="container">
-    {#if $currentUser.state === 'loggedIn'}
-        <LoggedInHeader />
-    {:else if $currentUser.state === 'loggedOut'}
-         <EmptyHeader />
-    {:else}
-        <LoadingHeader />
-    {/if}
-    <main>
-        <slot></slot>
-    </main>
+	{#if $currentUser.state === 'loggedIn'}
+		<LoggedInHeader />
+	{:else if $currentUser.state === 'loggedOut'}
+		<EmptyHeader />
+	{:else}
+		<LoadingHeader />
+	{/if}
+	<slot></slot>
 </div>
+
+<style>
+	.container {
+		min-height: 100dvh;
+		display: flex;
+		flex-direction: column;
+	}
+</style>
