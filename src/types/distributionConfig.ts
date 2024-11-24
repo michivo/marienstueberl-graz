@@ -7,7 +7,7 @@ export interface DistributionConfig {
     saturday: DayConfig;
     sunday: DayConfig;
 
-    timeSlotLengthMinutes: number;
+    timeSlotsPerHour: number;
     peoplePerSlot: number;
 }
 
