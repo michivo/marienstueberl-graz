@@ -55,18 +55,19 @@
 		}
 	}
 
-    async function saveConfig() {
+    async function saveConfig(e: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement; }) {
         if(!config) {
             return;
         }
         await updateConfig(config);
+		e.preventDefault();
     }
 </script>
 
 <div>
 	<h2>Einstellungen</h2>
 	{#if config}
-		<form on:submit|preventDefault={() => saveConfig()}>
+		<form onsubmit={(e) => saveConfig(e)}>
 			<h3>Wochentage mit Ausgabe</h3>
 			<div class="weekdays">
 				{#each WEEKDAY as day}
