@@ -61,3 +61,28 @@ export const setIsAdmin = onRequest({ region: 'europe-west1', cors: ['*'] }, asy
       response.status(403).send('Unauthorized');
     }
 });
+
+export const setIsPrivilegedUser = onRequest({ region: 'europe-west1', cors: ['*'] }, async (request, response) => {
+  const decodedIdToken = await getToken(request, response);
+  if(decodedIdToken && decodedIdToken.admin) {
+      await auth().setCustomUserClaims(decodedIdToken.uid, { privilegedUser: true });
+      logger.log('Granted admin rights successfully', decodedIdToken);
+      response.status(200).send('Success');
+    }
+    else {
+      logger.error('User is not an admin', decodedIdToken);
+      response.status(403).send('Unauthorized');
+    }
+});
+
+export const getUsers = onRequest({ region: 'europe-west1', cors: ['*'] }, async (request, response) => {
+  const decodedIdToken = await getToken(request, response);
+  if(decodedIdToken && decodedIdToken.admin) {
+    const users = await auth().listUsers();
+    response.status(200).send(users);
+  }
+  else {
+    logger.error('User is not an admin', decodedIdToken);
+    response.status(403).send('Unauthorized');
+  }
+});

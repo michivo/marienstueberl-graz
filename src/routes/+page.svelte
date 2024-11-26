@@ -5,6 +5,7 @@
 	import { currentUser } from '../stores/currentUser';
 	import { goto } from '$app/navigation';
 	import Spinner from '../components/misc/Spinner.svelte';
+	import { getIdTokenResult } from 'firebase/auth';
 
 	let firebaseUi = undefined as undefined | any;
 
@@ -17,9 +18,18 @@
 		}
 	});
 
-	currentUser.subscribe((value) => {
-		if (value.state === 'loggedIn') {
-			goto('/admin/clients');
+	currentUser.subscribe(async (value) => {
+		if (value.state === 'loggedIn' && value.user) {
+			const idToken = await getIdTokenResult(value.user);
+			if (idToken.claims['admin']) {
+				goto('/admin/clients');
+			}
+			else if(idToken.claims['privilegedUser']) {
+				goto('/handout');
+			}
+			else {
+				goto('/pickup');
+			}
 		}
 	});
 
