@@ -9,13 +9,12 @@
 
 import { onRequest } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
-import { initializeApp } from 'firebase-admin/app';
+import { App, initializeApp } from 'firebase-admin/app';
 import { auth } from 'firebase-admin';
 import { Request, Response } from 'express';
 import { DecodedIdToken } from 'firebase-admin/auth';
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+let app = undefined as App | undefined;
 
 export const helloWorld = onRequest({ region: 'europe-west1', cors: ['*'] }, (_, response) => {
   logger.info('Hello logs!', { structuredData: true });
@@ -43,16 +42,22 @@ async function getToken(request: Request, response: Response): Promise<DecodedId
     response.status(403).send('Unauthorized');
     return;
   }
-  initializeApp();
+  if(!app) {
+    app = initializeApp();
+  }
   const decodedIdToken = await auth().verifyIdToken(idToken);
   logger.log('ID Token correctly decoded', decodedIdToken);
   return decodedIdToken;
 }
 
 export const setIsAdmin = onRequest({ region: 'europe-west1', cors: ['*'] }, async (request, response) => {
+  if(request.method !== 'POST') {
+    response.status(405).send('Method Not Allowed');
+  }
   const decodedIdToken = await getToken(request, response);
   if(decodedIdToken && decodedIdToken.admin) {
-      await auth().setCustomUserClaims(decodedIdToken.uid, { admin: true });
+      const uid = request.body['uid'];
+      await auth().setCustomUserClaims(uid, { admin: true });
       logger.log('Granted admin rights successfully', decodedIdToken);
       response.status(200).send('Success');
     }
@@ -63,9 +68,13 @@ export const setIsAdmin = onRequest({ region: 'europe-west1', cors: ['*'] }, asy
 });
 
 export const setIsPrivilegedUser = onRequest({ region: 'europe-west1', cors: ['*'] }, async (request, response) => {
+  if(request.method !== 'POST') {
+    response.status(405).send('Method Not Allowed');
+  }
   const decodedIdToken = await getToken(request, response);
   if(decodedIdToken && decodedIdToken.admin) {
-      await auth().setCustomUserClaims(decodedIdToken.uid, { privilegedUser: true });
+      const uid = request.body['uid'];
+      await auth().setCustomUserClaims(uid, { privilegedUser: true });
       logger.log('Granted admin rights successfully', decodedIdToken);
       response.status(200).send('Success');
     }
