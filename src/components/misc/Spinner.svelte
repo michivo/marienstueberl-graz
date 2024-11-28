@@ -8,16 +8,24 @@
 	let top: number = +size / 2 - moonSize / 2;
 </script>
 
-<div
-	class="wrapper"
-	class:pause-animation={pause}
-	style="--size: {size}{unit}; --color: {color}; --moonSize: {top}{unit}; --duration: {duration};"
->
-	<div class="circle-one" class:pause-animation={pause}></div>
-	<div class="circle-two" class:pause-animation={pause}></div>
+<div class="spinner-container">
+	<div
+		class="wrapper"
+		class:pause-animation={pause}
+		style="--size: {size}{unit}; --color: {color}; --moonSize: {top}{unit}; --duration: {duration};"
+	>
+		<div class="circle-one" class:pause-animation={pause}></div>
+		<div class="circle-two" class:pause-animation={pause}></div>
+	</div>
 </div>
 
 <style>
+	.spinner-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+	}
 	.wrapper {
 		height: var(--size);
 		width: var(--size);

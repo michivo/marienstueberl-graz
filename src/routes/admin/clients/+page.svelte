@@ -134,7 +134,7 @@
 		<Modal bind:showModal={showAddOrEditModal}>
 			{#snippet header()}
 				<h2>
-					{isNew ? 'Klienten bearbeiten' : 'Neuen Klienten anlegen'}
+					{isNew ? 'Neuen Klienten anlegen' : 'Klienten bearbeiten' }
 				</h2>
 			{/snippet}
 			<AddOrEditClientModal client={currentClient} {saveClient} {closeClientsModal} />

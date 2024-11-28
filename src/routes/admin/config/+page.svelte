@@ -6,23 +6,31 @@
 		type WeekDay
 	} from '../../../types/distributionConfig';
 	import { getConfig, updateConfig } from '../../../services/distributionConfig';
+	import Spinner from '../../../components/misc/Spinner.svelte';
 
 	let config = $state(undefined as undefined | DistributionConfig);
+	let loading = $state(false);
+
 	let totalSlots = $derived.by(() => {
 		if (!config) return 0;
-        const totalHours = WEEKDAY.reduce((acc, day) => {
-            if (!config || !config[day].enabled) {
-                return acc;
-            }
-            const startHours = getHours(config[day].startTime);
-            const endHours = getHours(config[day].endTime);
-            return acc + (endHours - startHours);
-        }, 0);
-		return (config.peoplePerSlot * config.timeSlotsPerHour) * totalHours;
+		const totalHours = WEEKDAY.reduce((acc, day) => {
+			if (!config || !config[day].enabled) {
+				return acc;
+			}
+			const startHours = getHours(config[day].startTime);
+			const endHours = getHours(config[day].endTime);
+			return acc + (endHours - startHours);
+		}, 0);
+		return config.peoplePerSlot * config.timeSlotsPerHour * totalHours;
 	});
 
 	onMount(async () => {
-		config = await getConfig();
+		loading = true;
+		try {
+			config = await getConfig();
+		} finally {
+			loading = false;
+		}
 	});
 
 	function isEnabled(day: WeekDay) {
@@ -31,10 +39,10 @@
 		return configDay.enabled;
 	}
 
-    function getHours(timeString: string) {
-        const [hours, minutes] = timeString.split(':');
-        return parseInt(hours) + parseInt(minutes) / 60;
-    }
+	function getHours(timeString: string) {
+		const [hours, minutes] = timeString.split(':');
+		return parseInt(hours) + parseInt(minutes) / 60;
+	}
 
 	function getDayLabel(day: WeekDay) {
 		switch (day) {
@@ -55,13 +63,19 @@
 		}
 	}
 
-    async function saveConfig(e: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement; }) {
-        if(!config) {
-            return;
-        }
-        await updateConfig(config);
+	async function saveConfig(e: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement }) {
+		if (!config) {
+			return;
+		}
+		loading = true;
+		try {
+			await updateConfig(config);
+			config = await getConfig();
+		} finally {
+			loading = false;
+		}
 		e.preventDefault();
-    }
+	}
 </script>
 
 <div>
@@ -111,9 +125,16 @@
 						bind:value={config.peoplePerSlot}
 					/></label
 				>
-				<span class="slot-summary">Insgesamt können Lebensmittel an <span class="slot-count">{totalSlots} Personen</span> ausgegeben werden.</span>
+				<span class="slot-summary"
+					>Insgesamt können Lebensmittel an <span class="slot-count">{totalSlots} Personen</span> ausgegeben
+					werden.</span
+				>
 			</div>
-            <button type="submit">Speichern</button>
+			{#if loading}
+				 <Spinner />
+			{:else}
+				<button class="save-button" type="submit">Speichern</button>
+			{/if}
 		</form>
 	{/if}
 </div>
@@ -134,34 +155,40 @@
 			}
 		}
 
-        input {
-            margin-right: 0.5rem;
-        }
+		input {
+			margin-right: 0.5rem;
+		}
 	}
 
-    .slot-config {
-        margin-top: 2rem;
-    }
+	.slot-config {
+		margin-top: 2rem;
+	}
 	label.slot-config-item {
 		margin-top: 1rem;
-        display: flex;
+		display: flex;
 
-        span {
-            width: 20rem;
-            font-weight: 600;
-        }
+		span {
+			width: 20rem;
+			font-weight: 600;
+		}
 		input {
 			margin-left: 0.5rem;
 		}
 	}
 
-    .slot-summary {
-        display: block;
-        margin-top: 2rem;
-        font-size: 1.1rem;
+	.slot-summary {
+		display: block;
+		margin-top: 2rem;
+		font-size: 1.1rem;
 
-        .slot-count {
-            font-weight: 600;
-        }
-    }
+		.slot-count {
+			font-weight: 600;
+		}
+	}
+
+	button.save-button {
+		margin-top: 2rem;
+		width: 35rem;
+		font-size: 1.5rem;
+	}
 </style>
