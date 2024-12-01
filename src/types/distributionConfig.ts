@@ -13,10 +13,9 @@ export interface DistributionConfig {
 
 export interface DayConfig {
     enabled: boolean;
-    startTime: string;
-    endTime: string;
+    startTime?: string;
+    endTime?: string;
 }
 
 export const WEEKDAY = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
 export type WeekDay = typeof WEEKDAY[number];
-// export type WeekDay = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
