@@ -26,8 +26,6 @@ export async function getPreviousConfig(): Promise<DistributionConfig> {
     const previousMonday = getPreviousMonday();
     const configKey = getConfigKey(previousMonday);
     const result = await getConfig(configKey);
-    console.error('result');
-    console.error(result);
     if (!result) {
         const emptyDay: DayConfig = { enabled: false };
         return {
@@ -47,6 +45,7 @@ export async function getPreviousConfig(): Promise<DistributionConfig> {
 
 async function getConfig(configKey: string) {
     const database = firebaseDb;
+    console.error(configKey);
     const configRef = doc(database, collectionName, configKey);
     const configDoc = await getDoc(configRef);
     return configDoc.data() as DistributionConfig;
