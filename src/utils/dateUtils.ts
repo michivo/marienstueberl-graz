@@ -20,3 +20,7 @@ export function getWeekdayDate(startDate: Date, weekDay: WeekDay) {
   d.setHours(0, 0, 0, 0);
   return d;
 }
+
+export function toISODateString(date: Date) {
+  return date.toISOString().split('T')[0];
+}
