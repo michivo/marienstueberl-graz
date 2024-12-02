@@ -3,13 +3,17 @@
 	import { getPreviousConfig } from '../../../services/distributionConfig';
 	import { firebaseAuth } from '../../../services/firebase';
 	import { getTimeSlots } from '../../../utils/configUtils';
+	import type { TimeSlotDay } from '../../../types/timeSlot';
+	import { getCurrentMonday, getWeekdayDate } from '../../../utils/dateUtils';
+	import type { WeekDay } from '../../../types/distributionConfig';
 
 	let error = '';
 
+	let timeSlots = $state<TimeSlotDay[]>([]);
+
 	onMount(async () => {
 		const configuration = await getPreviousConfig();
-		const timeSlots = getTimeSlots(configuration);
-		console.error(timeSlots);
+		timeSlots = getTimeSlots(configuration);
 	});
 
 	async function makeReservation() {
@@ -40,9 +44,19 @@
 			console.error(ex);
 		}
 	}
+
+	function formatWeekDay(weekDay: WeekDay) {
+		const date = getWeekdayDate(getCurrentMonday(), weekDay);
+		return `${date.toLocaleDateString('de-AT', { weekday: 'long' })}, ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+	}
 </script>
 
 <div>
-
+	{#each timeSlots as day}
+		<h2>{formatWeekDay(day.weekDay)}</h2>
+		{#each day.slots as timeSlot}
+			<p>{timeSlot.startTime} - {timeSlot.endTime}</p>
+		{/each}
+	{/each}
 	<button onclick={makeReservation}>Make Reservation</button>
 </div>
