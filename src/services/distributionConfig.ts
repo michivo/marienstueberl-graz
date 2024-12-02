@@ -1,7 +1,7 @@
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { firebaseDb } from "./firebase";
 import type { DayConfig, DistributionConfig } from "../types/distributionConfig";
-import { getNextMonday, getPreviousMonday } from "../utils/dateUtils";
+import { getNextMonday, getCurrentMonday } from "../utils/dateUtils";
 
 type DistributionConfigDoc = Partial<DistributionConfig>;
 
@@ -23,7 +23,7 @@ export async function getUpcomingConfig() {
 }
 
 export async function getPreviousConfig(): Promise<DistributionConfig> {
-    const previousMonday = getPreviousMonday();
+    const previousMonday = getCurrentMonday();
     const configKey = getConfigKey(previousMonday);
     const result = await getConfig(configKey);
     if (!result) {

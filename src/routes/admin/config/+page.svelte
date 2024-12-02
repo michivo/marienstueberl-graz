@@ -11,7 +11,7 @@
 		upsertConfig
 	} from '../../../services/distributionConfig';
 	import Spinner from '../../../components/misc/Spinner.svelte';
-	import { getNextMonday, getPreviousMonday } from '../../../utils/dateUtils';
+	import { getNextMonday, getCurrentMonday } from '../../../utils/dateUtils';
 
 	let config = $state(undefined as undefined | DistributionConfig);
 	let loading = $state(false);
@@ -41,7 +41,7 @@
 			const startDay = getNextMonday();
 			return formatTimeRange(startDay);
 		}
-		const startDay = getPreviousMonday();
+		const startDay = getCurrentMonday();
 		return formatTimeRange(startDay);
 	});
 
