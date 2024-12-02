@@ -6,17 +6,25 @@
 	import type { TimeSlot, TimeSlotDay } from '../../../types/timeSlot';
 	import { getCurrentMonday, getWeekdayDate, toISODateString } from '../../../utils/dateUtils';
 	import type { WeekDay } from '../../../types/distributionConfig';
+	import type { Unsubscribe } from 'firebase/firestore';
+	import { subscribeToBookings } from '../../../services/bookings';
+	import type { Booking } from '../../../types/booking';
 
 	let error = '';
 
 	let timeSlots = $state<TimeSlotDay[]>([]);
+	let bookings = $state<Booking[]>([]);
+	
+	let unsubscribe = undefined as undefined | Unsubscribe;
 
 	onMount(async () => {
 		const configuration = await getPreviousConfig();
 		timeSlots = getTimeSlots(configuration);
+		unsubscribe = subscribeToBookings(b => bookings = b);
 	});
 
 	onDestroy(() => {
+		unsubscribe?.();
 		error = '';
 	});
 
@@ -51,6 +59,13 @@
 		const date = getWeekdayDate(getCurrentMonday(), weekDay);
 		return `${date.toLocaleDateString('de-AT', { weekday: 'long' })}, ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
 	}
+
+	function hasReservation(day: WeekDay, timeSlot: TimeSlot) {
+		const weekOfDay = getCurrentMonday();
+		const reservationDay = getWeekdayDate(weekOfDay, day);
+		const reservation = bookings.find(b => toISODateString(b.date) === toISODateString(reservationDay) && b.startTime === timeSlot.startTime);
+		return !!reservation;
+	}
 </script>
 
 <div class="container">
@@ -58,7 +73,11 @@
 		<h2>{formatWeekDay(day.weekDay)}</h2>
 		<div class="day-buttons">
 			{#each day.slots as timeSlot}
-				<button onclick={() => makeReservation(day.weekDay, timeSlot)}>{timeSlot.startTime} - {timeSlot.endTime}</button>
+				<button onclick={() => makeReservation(day.weekDay, timeSlot)}>{timeSlot.startTime} - {timeSlot.endTime}
+					{#if hasReservation(day.weekDay, timeSlot)}
+						 <br>(Reserviert)
+					{/if}
+				</button>
 			{/each}
 		</div>
 	{/each}

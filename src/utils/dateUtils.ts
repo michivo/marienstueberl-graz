@@ -21,6 +21,7 @@ export function getWeekdayDate(startDate: Date, weekDay: WeekDay) {
   return d;
 }
 
-export function toISODateString(date: Date) {
-  return date.toISOString().split('T')[0];
+export function toISODateString(date: Date | string) {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toISOString().split('T')[0];
 }

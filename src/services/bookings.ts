@@ -1,6 +1,6 @@
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, onSnapshot, query, where, type Unsubscribe } from "firebase/firestore";
 import { firebaseDb } from "./firebase";
-import { getCurrentMonday } from "../utils/dateUtils";
+import { getCurrentMonday, toISODateString } from "../utils/dateUtils";
 import type { Booking } from "../types/booking";
 import type { Client } from "../types/client";
 
@@ -22,4 +22,20 @@ export async function makeBooking(client: Client, date: Date, startTime: string,
     const bookingCollection = collection(database, collectionName);
     const bookingDoc = { ...booking as BookingDoc };
     await addDoc(bookingCollection, bookingDoc);
+}
+
+export function subscribeToBookings(callback: (bookings: Booking[]) => void): Unsubscribe {
+    const database = firebaseDb;
+    const bookingCollection = collection(database, collectionName);
+    const weekOf = toISODateString(getCurrentMonday());
+    const bookingQuery = query(bookingCollection, where('weekOf', '==', weekOf));
+    const unsubscribe = onSnapshot(bookingQuery, (snapshot) => {
+        const bookings : Booking[] = [];
+        snapshot.forEach((doc) => {
+            const booking = doc.data() as Booking;
+            bookings.push(booking);
+        });
+        callback(bookings);
+    });
+    return unsubscribe;
 }
