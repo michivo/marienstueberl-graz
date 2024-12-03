@@ -4,10 +4,10 @@ export type BookingStatus = 'confirmed' | 'pickedUp' | 'cancelled';
 
 export interface Booking {
     client: Client,
-    weekOf: Date,
-    date: Date,
+    weekOf: string,
+    date: string,
     startTime: string,
     endTime: string,
     status: BookingStatus,
-    pickupTime?: string,
+    pickUpDateTimeLocal?: string,
 }

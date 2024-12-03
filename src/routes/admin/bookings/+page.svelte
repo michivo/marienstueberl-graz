@@ -48,6 +48,22 @@
 		const date = getWeekdayDate(getCurrentMonday(), weekDay);
 		return `${date.toLocaleDateString('de-AT', { weekday: 'long' })}, ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
 	}
+
+    function getStatusLabel(booking: Booking) {
+        if (booking.status === 'confirmed') {
+            return 'Reserviert';
+        } else if (booking.status === 'pickedUp') {
+            const result = 'Abgeholt';
+            if(booking.pickUpDateTimeLocal) {
+                const date = new Date(booking.pickUpDateTimeLocal);
+                return `${result} (${date.toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit' })})`;
+            } else {
+                return result;
+            }
+        } else {
+            return 'Storniert';
+        }
+    }
 </script>
 
 <div class="container">
@@ -64,11 +80,7 @@
 				>
 					<span class="times">{booking.startTime} - {booking.endTime}</span>
                     <span class="client-name">{booking.client.name}</span>
-					<span class="status">({booking.status === 'confirmed'
-							? 'Reserviert'
-							: booking.status === 'pickedUp'
-								? 'Abgeholt'
-								: 'Storniert'})
+					<span class="status">{getStatusLabel(booking)}
                     </span>
 				</div>
 			{/each}

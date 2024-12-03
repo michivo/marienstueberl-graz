@@ -3,6 +3,8 @@
 	import LoggedInHeader from '../components/headers/LoggedInHeader.svelte';
 	import EmptyHeader from '../components/headers/EmptyHeader.svelte';
 	import LoadingHeader from '../components/headers/LoadingHeader.svelte';
+	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 </script>
 
 <div class="container">

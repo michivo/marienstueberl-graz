@@ -8,7 +8,6 @@
 	import { getIdTokenResult } from 'firebase/auth';
 
 	let firebaseUi = undefined as undefined | any;
-	let firebaseInitialized = false;
 
 	onMount(async () => {
 		if ($currentUser.state === 'loggedOut') {
