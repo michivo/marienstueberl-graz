@@ -12,8 +12,6 @@ export async function getUpcomingConfig() {
     const nextMonday = getNextMonday();
     const configKey = getConfigKey(nextMonday);
     const upcomingConfig = await getConfig(configKey);
-    console.error('upcomingConfig');
-    console.error(upcomingConfig);
     if (!upcomingConfig) {
         const previousConfig = await getPreviousConfig();
         await upsertConfig(previousConfig);
@@ -23,8 +21,8 @@ export async function getUpcomingConfig() {
 }
 
 export async function getPreviousConfig(): Promise<DistributionConfig> {
-    const previousMonday = getCurrentMonday();
-    const configKey = getConfigKey(previousMonday);
+    const currentMonday = getCurrentMonday();
+    const configKey = getConfigKey(currentMonday);
     const result = await getConfig(configKey);
     if (!result) {
         const emptyDay: DayConfig = { enabled: false };
@@ -45,7 +43,6 @@ export async function getPreviousConfig(): Promise<DistributionConfig> {
 
 async function getConfig(configKey: string) {
     const database = firebaseDb;
-    console.error(configKey);
     const configRef = doc(database, collectionName, configKey);
     const configDoc = await getDoc(configRef);
     return configDoc.data() as DistributionConfig;

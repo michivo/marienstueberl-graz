@@ -2,7 +2,10 @@
   "name": "functions",
   "scripts": {
     "lint": "eslint src/**",
-    "build": "copy ..\\src\\types\\*.ts src\\types && tsc",
+    "copy:types": "copy ..\\src\\types\\*.ts src\\types\\",
+    "copy:utils": "copy ..\\src\\utils\\*.ts src\\utils",
+    "copy": "npm run copy:types && npm run copy:utils",
+    "build": "npm run copy && tsc",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",

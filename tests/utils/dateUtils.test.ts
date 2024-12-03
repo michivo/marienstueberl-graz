@@ -68,8 +68,6 @@ test('getCurrentMonday on a Tuesday returns following Monday', () => {
 	const date = new Date(2024, 11, 3);
 
     const currentMonday = getCurrentMonday(date);
-    console.error(currentMonday);
-    console.error(date);
     
     expect(currentMonday).toEqual(new Date(2024, 11, 2));
     expect(currentMonday.getDay()).toEqual(1);

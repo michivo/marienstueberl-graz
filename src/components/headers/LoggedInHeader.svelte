@@ -5,7 +5,7 @@
 
 <header>
 	<span>Angemeldet als <span class="username">{$currentUser.user?.displayName}</span></span>
-	<button on:click={async () => await logOut()}>Sign Out</button>
+	<button on:click={async () => await logOut()}>Abmelden</button>
 </header>
 
 <style lang="scss" scoped>

@@ -44,7 +44,6 @@
 
 <div class="landing-content">
 {#if $currentUser.state === 'pending'}
-	<div>Lade...</div>
 	<Spinner />
 {:else if $currentUser.state === 'loggedOut'}
 	<div id="firebaseui-auth-container"></div>

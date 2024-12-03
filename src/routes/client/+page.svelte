@@ -10,7 +10,6 @@
 		const baseUrl = window.location.origin;
 		state = (urlParams.get('state') as 'valid' | 'invalid' | 'upcoming') || 'valid';
 		data = baseUrl + '/handout/' + state + '.html';
-        console.error(state);
 	});
 </script>
 
