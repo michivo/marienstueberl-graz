@@ -62,6 +62,33 @@
 		}
 	}
 
+	async function cancelReservation() {
+		console.log('Making reservation');
+		try {
+			const token = await firebaseAuth.currentUser?.getIdToken(false);
+			const weekOfDay = getCurrentMonday();
+			const response = await fetch('http://127.0.0.1:5001/marienstueberl-graz/europe-west1/cancelReservation', {
+				headers: { Authorization: `Bearer ${token}` },
+				method: 'POST',
+				body: JSON.stringify({
+					weekOf: toISODateString(weekOfDay),
+				})
+			});
+			if(!response.ok) {
+				error = await response.text();
+				hasUnconfirmedError = true;
+			}
+		} catch (ex) {
+			hasUnconfirmedError = true;
+			if (ex instanceof Error) {
+				error = ex?.message ?? 'Unbekannter Fehler';
+			} else {
+				error = 'Unbekannter Fehler';
+			}
+			console.error(ex);
+		}
+	}	
+
 	function formatWeekDay(weekDay: WeekDay) {
 		const date = getWeekdayDate(getCurrentMonday(), weekDay);
 		return `${date.toLocaleDateString('de-AT', { weekday: 'long' })}, ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
@@ -73,23 +100,23 @@
 		const reservation = bookings.find(
 			(b) =>
 				toISODateString(b.date) === toISODateString(reservationDay) &&
-				b.startTime === timeSlot.startTime
+				b.startTime === timeSlot.startTime &&
+				b.client.email === firebaseAuth.currentUser?.email
 		);
 		return !!reservation;
 	}
 
 	function canMakeReservation(day: WeekDay, timeSlot: TimeSlot) {
-		if (hasReservation(day, timeSlot)) {
+		const hasAnyReservation = bookings.find(
+			(b) => b.client.email === firebaseAuth.currentUser?.email);
+		if (hasAnyReservation) {
 			return false;
 		}
 		const numReservations = bookings.filter((b) => b.startTime === timeSlot.startTime).length;
 		if (!configuration || numReservations >= configuration?.peoplePerSlot) {
 			return false;
 		}
-	}
-
-	function cancelReservation(day: WeekDay, timeSlot: TimeSlot) {
-		console.log('Canceling reservation');
+		return true;
 	}
 </script>
 
@@ -103,11 +130,11 @@
 						{timeSlot.startTime} - {timeSlot.endTime}
 					</button>
 				{:else if hasReservation(day.weekDay, timeSlot)}
-					<button onclick={() => cancelReservation(day.weekDay, timeSlot)} class="reserved">
+					<button onclick={() => cancelReservation()} class="reserved">
 						{timeSlot.startTime} - {timeSlot.endTime}<br />(Reserviert)
 					</button>
 				{:else}
-					<button onclick={() => makeReservation(day.weekDay, timeSlot)}>
+					<button disabled>
 						{timeSlot.startTime} - {timeSlot.endTime}
 					</button>
 				{/if}
@@ -138,6 +165,12 @@
 	.day-buttons button {
 		margin: 0.5rem;
 		height: 5rem;
+	}
+
+	button:disabled {
+		background-color: var(--secondary-light);
+		color: var(--secondary-dark);
+		cursor: not-allowed;
 	}
 
 	.day-buttons button.reserved {

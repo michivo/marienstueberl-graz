@@ -6,6 +6,7 @@ import { Request, Response } from 'express';
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { grantAdminRights } from './api/grantUserRights';
 import { doMakeReservation } from './api/makeReservation';
+import { doCancelReservation } from './api/cancelReservation';
 
 let app = undefined as App | undefined;
 
@@ -88,4 +89,17 @@ export const makeReservation = onRequest({ region: 'europe-west1', cors: ['*'] }
   }
 });
 
+export const cancelReservation = onRequest({ region: 'europe-west1', cors: ['*'] }, async (request, response) => {
+  if (request.method !== 'POST') {
+    response.status(405).send('Method Not Allowed');
+  }
+  const decodedIdToken = await getToken(request, response);
+  if (decodedIdToken) {
+    await doCancelReservation(decodedIdToken, request, response);
+  }
+  else {
+    logger.error('User is not logged in', decodedIdToken);
+    response.status(403).send('Unauthorized');
+  }
+});
 
