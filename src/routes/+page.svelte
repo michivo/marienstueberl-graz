@@ -8,13 +8,16 @@
 	import { getIdTokenResult } from 'firebase/auth';
 
 	let firebaseUi = undefined as undefined | any;
+	let firebaseInitialized = false;
 
 	onMount(async () => {
-		const firebaseUi = await firebaseAuthUi();
-		if (firebaseUi) {
-			firebaseUi.start('#firebaseui-auth-container', {
-				signInOptions: authProviders,
-			});
+		if ($currentUser.state === 'loggedOut') {
+			const firebaseUi = await firebaseAuthUi();
+			if (firebaseUi) {
+				firebaseUi.start('#firebaseui-auth-container', {
+					signInOptions: authProviders
+				});
+			}
 		}
 	});
 
@@ -23,19 +26,25 @@
 			const idToken = await getIdTokenResult(value.user);
 			if (idToken.claims['admin']) {
 				goto('/admin/clients');
-			}
-			else if(idToken.claims['privilegedUser']) {
+			} else if (idToken.claims['privilegedUser']) {
 				goto('/handout');
+			} else {
+				goto('/client');
 			}
-			else {
-				goto('/pickup');
+		}
+		else if(value.state === 'loggedOut') {
+			const firebaseUi = await firebaseAuthUi();
+			if (firebaseUi) {
+				firebaseUi.start('#firebaseui-auth-container', {
+					signInOptions: authProviders
+				});
 			}
 		}
 	});
 
 	async function firebaseAuthUi() {
 		if (browser && !firebaseUi) {
-            const firebaseui = await import('firebaseui');
+			const firebaseui = await import('firebaseui');
 			firebaseUi = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(firebaseAuth);
 		}
 		return firebaseUi;
@@ -43,11 +52,11 @@
 </script>
 
 <div class="landing-content">
-{#if $currentUser.state === 'pending'}
-	<Spinner />
-{:else if $currentUser.state === 'loggedOut'}
-	<div id="firebaseui-auth-container"></div>
-{/if}
+	{#if $currentUser.state === 'pending'}
+		<Spinner />
+	{:else if $currentUser.state === 'loggedOut'}
+		<div id="firebaseui-auth-container"></div>
+	{/if}
 </div>
 
 <style lang="scss">
@@ -67,4 +76,3 @@
 		}
 	}
 </style>
-

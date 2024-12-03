@@ -29,6 +29,9 @@
 				<li class:active={$page.url.pathname === '/admin/clients'}>
 					<a href="/admin/clients"><span>Klient:innen</span></a>
 				</li>
+                <li class:active={$page.url.pathname === '/admin/bookings'}>
+					<a href="/admin/bookings"><span>Wochenübersicht</span></a>
+				</li>
 				<li class:active={$page.url.pathname === '/admin/config'}>
                     <a href="/admin/config"><span>Einstellungen</span></a>
                 </li>

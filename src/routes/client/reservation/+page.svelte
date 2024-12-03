@@ -10,14 +10,16 @@
 	import { subscribeToBookings } from '../../../services/bookings';
 	import type { Booking } from '../../../types/booking';
 	import Modal from '../../../components/misc/Modal.svelte';
+	import Spinner from '../../../components/misc/Spinner.svelte';
 
 	let error = $state('');
 	let timeSlots = $state<TimeSlotDay[]>([]);
 	let bookings = $state<Booking[]>([]);
 	let hasUnconfirmedError = $state(false);
+	let configuration = $state<DistributionConfig | undefined>(undefined);
+	let loading = $state(false);
 
 	let unsubscribe = undefined as undefined | Unsubscribe;
-	let configuration = undefined as undefined | DistributionConfig;
 
 	onMount(async () => {
 		configuration = await getPreviousConfig();
@@ -31,23 +33,26 @@
 	});
 
 	async function makeReservation(day: WeekDay, timeSlot: TimeSlot) {
-		console.log('Making reservation');
+		loading = true;
 		try {
 			const token = await firebaseAuth.currentUser?.getIdToken(false);
 			const weekOfDay = getCurrentMonday();
 			const reservationDay = getWeekdayDate(weekOfDay, day);
-			const response = await fetch('http://127.0.0.1:5001/marienstueberl-graz/europe-west1/makeReservation', {
-				headers: { Authorization: `Bearer ${token}` },
-				method: 'POST',
-				body: JSON.stringify({
-					weekOf: toISODateString(weekOfDay),
-					startTime: timeSlot.startTime,
-					endTime: timeSlot.endTime,
-					status: 'confirmed',
-					date: toISODateString(reservationDay)
-				})
-			});
-			if(!response.ok) {
+			const response = await fetch(
+				'http://127.0.0.1:5001/marienstueberl-graz/europe-west1/makeReservation',
+				{
+					headers: { Authorization: `Bearer ${token}` },
+					method: 'POST',
+					body: JSON.stringify({
+						weekOf: toISODateString(weekOfDay),
+						startTime: timeSlot.startTime,
+						endTime: timeSlot.endTime,
+						status: 'confirmed',
+						date: toISODateString(reservationDay)
+					})
+				}
+			);
+			if (!response.ok) {
 				error = await response.text();
 				hasUnconfirmedError = true;
 			}
@@ -59,22 +64,28 @@
 				error = 'Unbekannter Fehler';
 			}
 			console.error(ex);
+		} finally {
+			loading = false;
 		}
 	}
 
 	async function cancelReservation() {
-		console.log('Making reservation');
+		loading = true;
+		console.log('Cancelling reservation');
 		try {
 			const token = await firebaseAuth.currentUser?.getIdToken(false);
 			const weekOfDay = getCurrentMonday();
-			const response = await fetch('http://127.0.0.1:5001/marienstueberl-graz/europe-west1/cancelReservation', {
-				headers: { Authorization: `Bearer ${token}` },
-				method: 'POST',
-				body: JSON.stringify({
-					weekOf: toISODateString(weekOfDay),
-				})
-			});
-			if(!response.ok) {
+			const response = await fetch(
+				'http://127.0.0.1:5001/marienstueberl-graz/europe-west1/cancelReservation',
+				{
+					headers: { Authorization: `Bearer ${token}` },
+					method: 'POST',
+					body: JSON.stringify({
+						weekOf: toISODateString(weekOfDay)
+					})
+				}
+			);
+			if (!response.ok) {
 				error = await response.text();
 				hasUnconfirmedError = true;
 			}
@@ -86,8 +97,10 @@
 				error = 'Unbekannter Fehler';
 			}
 			console.error(ex);
+		} finally {
+			loading = false;
 		}
-	}	
+	}
 
 	function formatWeekDay(weekDay: WeekDay) {
 		const date = getWeekdayDate(getCurrentMonday(), weekDay);
@@ -108,39 +121,68 @@
 
 	function canMakeReservation(day: WeekDay, timeSlot: TimeSlot) {
 		const hasAnyReservation = bookings.find(
-			(b) => b.client.email === firebaseAuth.currentUser?.email);
+			(b) => b.client.email === firebaseAuth.currentUser?.email
+		);
 		if (hasAnyReservation) {
 			return false;
 		}
-		const numReservations = bookings.filter((b) => b.startTime === timeSlot.startTime).length;
+		const weekOfDay = getCurrentMonday();
+		const reservationDay = getWeekdayDate(weekOfDay, day);
+		const numReservations = bookings.filter(
+			(b) =>
+				toISODateString(b.date) === toISODateString(reservationDay) &&
+				b.startTime === timeSlot.startTime
+		).length;
 		if (!configuration || numReservations >= configuration?.peoplePerSlot) {
 			return false;
 		}
 		return true;
 	}
+
+	function getBookingCount(day: WeekDay, timeSlot: TimeSlot) {
+		const weekOfDay = getCurrentMonday();
+		const reservationDay = getWeekdayDate(weekOfDay, day);
+		const numReservations = bookings.filter(
+			(b) =>
+				toISODateString(b.date) === toISODateString(reservationDay) &&
+				b.startTime === timeSlot.startTime
+		).length;
+		return numReservations;
+	}
 </script>
 
 <div class="container">
-	{#each timeSlots as day}
-		<h2>{formatWeekDay(day.weekDay)}</h2>
-		<div class="day-buttons">
-			{#each day.slots as timeSlot}
-				{#if canMakeReservation(day.weekDay, timeSlot)}
-					<button onclick={() => makeReservation(day.weekDay, timeSlot)}>
-						{timeSlot.startTime} - {timeSlot.endTime}
-					</button>
-				{:else if hasReservation(day.weekDay, timeSlot)}
-					<button onclick={() => cancelReservation()} class="reserved">
-						{timeSlot.startTime} - {timeSlot.endTime}<br />(Reserviert)
-					</button>
-				{:else}
-					<button disabled>
-						{timeSlot.startTime} - {timeSlot.endTime}
-					</button>
-				{/if}
-			{/each}
-		</div>
-	{/each}
+	<h1>Reservierung</h1>
+	{#if loading}
+		<Spinner />
+	{:else}
+		{#each timeSlots as day}
+			<h2>{formatWeekDay(day.weekDay)}</h2>
+			<div class="day-buttons">
+				{#each day.slots as timeSlot}
+					{#if canMakeReservation(day.weekDay, timeSlot)}
+						<button onclick={() => makeReservation(day.weekDay, timeSlot)}>
+							{timeSlot.startTime} - {timeSlot.endTime}<br />
+							{#if configuration?.peoplePerSlot}
+								<span class="free-info">
+									{configuration.peoplePerSlot - getBookingCount(day.weekDay, timeSlot)} / {configuration.peoplePerSlot}
+									frei
+								</span>
+							{/if}
+						</button>
+					{:else if hasReservation(day.weekDay, timeSlot)}
+						<button onclick={() => cancelReservation()} class="reserved">
+							{timeSlot.startTime} - {timeSlot.endTime}<br />(Reserviert)
+						</button>
+					{:else}
+						<button disabled>
+							{timeSlot.startTime} - {timeSlot.endTime}<br /><span class="free-info">(Ausgebucht)</span>
+						</button>
+					{/if}
+				{/each}
+			</div>
+		{/each}
+	{/if}
 	<Modal bind:showModal={hasUnconfirmedError}>
 		{#snippet header()}
 			<h2>Fehler bei der Reservierung</h2>
@@ -148,7 +190,9 @@
 		<div class="error-details">
 			Der Termin konnte nicht reserviert werden: {error}
 		</div>
-		<button class="confirm-button" type="submit" onclick={() => hasUnconfirmedError = false}>OK</button>
+		<button class="confirm-button" type="submit" onclick={() => (hasUnconfirmedError = false)}>
+			OK
+		</button>
 	</Modal>
 </div>
 
@@ -183,6 +227,11 @@
 
 	.error-details {
 		margin: 1rem 0;
+		font-weight: 300;
+	}
+
+	.free-info {
+		font-size: 0.9rem;
 		font-weight: 300;
 	}
 </style>
