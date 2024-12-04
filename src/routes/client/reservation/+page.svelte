@@ -11,6 +11,8 @@
 	import type { Booking } from '../../../types/booking';
 	import Modal from '../../../components/misc/Modal.svelte';
 	import Spinner from '../../../components/misc/Spinner.svelte';
+	import { getFunctionUris } from '../../../services/functionUris';
+	import { page } from '$app/stores';
 
 	let error = $state('');
 	let timeSlots = $state<TimeSlotDay[]>([]);
@@ -18,6 +20,11 @@
 	let hasUnconfirmedError = $state(false);
 	let configuration = $state<DistributionConfig | undefined>(undefined);
 	let loading = $state(false);
+
+	const hasAnyReservation = $derived(() => bookings.find(
+			(b) => b.client.email === firebaseAuth.currentUser?.email
+		)
+	);
 
 	let unsubscribe = undefined as undefined | Unsubscribe;
 
@@ -38,8 +45,8 @@
 			const token = await firebaseAuth.currentUser?.getIdToken(false);
 			const weekOfDay = getCurrentMonday();
 			const reservationDay = getWeekdayDate(weekOfDay, day);
-			const response = await fetch(
-				'http://127.0.0.1:5001/marienstueberl-graz/europe-west1/makeReservation',
+			console.log('Making reservation', reservationDay, timeSlot);
+			const response = await fetch(getFunctionUris($page.url.origin).makeReservation,
 				{
 					headers: { Authorization: `Bearer ${token}` },
 					method: 'POST',
@@ -75,8 +82,7 @@
 		try {
 			const token = await firebaseAuth.currentUser?.getIdToken(false);
 			const weekOfDay = getCurrentMonday();
-			const response = await fetch(
-				'http://127.0.0.1:5001/marienstueberl-graz/europe-west1/cancelReservation',
+			const response = await fetch(getFunctionUris($page.url.origin).cancelReservation,
 				{
 					headers: { Authorization: `Bearer ${token}` },
 					method: 'POST',
@@ -120,12 +126,7 @@
 	}
 
 	function canMakeReservation(day: WeekDay, timeSlot: TimeSlot) {
-		const hasAnyReservation = bookings.find(
-			(b) => b.client.email === firebaseAuth.currentUser?.email
-		);
-		if (hasAnyReservation) {
-			return false;
-		}
+
 		const weekOfDay = getCurrentMonday();
 		const reservationDay = getWeekdayDate(weekOfDay, day);
 		const numReservations = bookings.filter(
@@ -134,6 +135,7 @@
 				b.startTime === timeSlot.startTime
 		).length;
 		if (!configuration || numReservations >= configuration?.peoplePerSlot) {
+			console.log('No more reservations allowed');
 			return false;
 		}
 		return true;
@@ -160,7 +162,7 @@
 			<h2>{formatWeekDay(day.weekDay)}</h2>
 			<div class="day-buttons">
 				{#each day.slots as timeSlot}
-					{#if canMakeReservation(day.weekDay, timeSlot)}
+					{#if canMakeReservation(day.weekDay, timeSlot) && !hasAnyReservation}
 						<button onclick={() => makeReservation(day.weekDay, timeSlot)}>
 							{timeSlot.startTime} - {timeSlot.endTime}<br />
 							{#if configuration?.peoplePerSlot}
@@ -176,7 +178,10 @@
 						</button>
 					{:else}
 						<button disabled>
-							{timeSlot.startTime} - {timeSlot.endTime}<br /><span class="free-info">(Ausgebucht)</span>
+							{timeSlot.startTime} - {timeSlot.endTime}<br />
+							{#if !hasAnyReservation}
+								<span class="free-info">(Ausgebucht)</span>
+							{/if}
 						</button>
 					{/if}
 				{/each}

@@ -16,20 +16,12 @@ const config = {
 			// these options are set automatically — see below
 			pages: 'build',
 			assets: 'build',
-			fallback: undefined,
+			fallback: 'index.html',
 			precompress: false,
 			strict: true
 		}),
 		prerender: {
             crawl: true,
-            entries: [
-				'/',
-                '/handout/valid',
-                '/handout/invalid',
-                '/handout/upcoming',
-				'/pickup',
-				'/welcome',
-            ]
 		}
 	}
 };

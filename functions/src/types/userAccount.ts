@@ -6,7 +6,7 @@ export interface UserAccount {
         creationTime: string,
         lastSignInTime: string
     },
-    customClaims: {
+    customClaims?: {
         admin: boolean,
         privilegedUser: boolean
     }

@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { page } from "$app/stores";
 	import { firebaseAuth } from "../../services/firebase";
+	import { getFunctionUris } from "../../services/functionUris";
 	import type { UserAccount } from "../../types/userAccount";
 	import DeleteIcon from "../icons/DeleteIcon.svelte";
 	import EditIcon from "../icons/EditIcon.svelte";
@@ -14,7 +16,7 @@
 
     async function makePrivileged(user: UserAccount) {
         const token = await firebaseAuth.currentUser?.getIdToken(false);
-        fetch('https://setisprivilegeduser-joqt3ovt4q-ew.a.run.app', {
+        fetch(getFunctionUris($page.url.origin).setIsPrivilegedUser, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -52,7 +54,7 @@
         <td>{ user.displayName }</td>
         <td>{ user.email }</td>
         <td>{ user.metadata.lastSignInTime ?? ' - ' }</td>
-        <td>{ user.customClaims.admin ? 'Admin' : user.customClaims.privilegedUser ? 'Helfer' : 'Klient' }</td>
+        <td>{ user.customClaims?.admin ? 'Admin' : user.customClaims?.privilegedUser ? 'Helfer' : 'Klient' }</td>
         <td>							
             <IconButton disabled={ loading } on:click={() => onEditUser(user)}><EditIcon /></IconButton>
             <IconButton disabled={ loading } on:click={() => onDeleteUser(user)}><DeleteIcon /></IconButton>

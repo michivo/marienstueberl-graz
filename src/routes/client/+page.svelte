@@ -1,5 +1,4 @@
 <script lang="ts">
-	import QrCode from '@castlenine/svelte-qrcode';
 	import { onMount } from 'svelte';
 
 	let data = '';

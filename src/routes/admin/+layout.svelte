@@ -16,10 +16,23 @@
 				await logOut();
 				await goto('/');
 			}
-		} else {
-			goto('/');
 		}
 	});
+
+    currentUser.subscribe(async (value) => {
+        if (value.state === 'loggedOut') {
+            console.error('Not logged in');
+            await goto('/');
+        }
+        else if(value.state === 'loggedIn' && value.user) {
+            const idToken = await getIdTokenResult(value.user);
+			if (!idToken.claims['admin']) {
+				console.error('Not an admin');
+				await logOut();
+				await goto('/');
+			}
+        }
+    });
 </script>
 
 {#if $currentUser.state === 'loggedIn'}
@@ -86,7 +99,7 @@
                     padding: 1rem 0;
                     font-weight: 300;
 
-                    a:hover {
+                    &:hover {
                         color: var(--light);
                     }
 

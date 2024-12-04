@@ -11,3 +11,7 @@ export interface Booking {
     status: BookingStatus,
     pickUpDateTimeLocal?: string,
 }
+
+export interface BookingWithId extends Booking {
+    id: string,
+}

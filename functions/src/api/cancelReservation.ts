@@ -27,6 +27,7 @@ export async function doCancelReservation(decodedIdToken: DecodedIdToken, reques
         }
 
         firebaseDb.collection('bookings').doc(currentBooking.docs[0].id).delete();
+        response.status(200).send('Success');
     } catch (error) {
         logger.error('Deleting booking failed', error);
         response.status(500).send('Fehler beim Löschen der Buchung.');

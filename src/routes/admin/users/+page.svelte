@@ -4,6 +4,8 @@
 	import UserList from '../../../components/users/UserList.svelte';
 	import type { UserAccount } from '../../../types/userAccount';
 	import Spinner from '../../../components/misc/Spinner.svelte';
+	import { getFunctionUris } from '../../../services/functionUris';
+	import { page } from '$app/stores';
 
 	let users: UserAccount[] = $state([]);
 	let loading = $state(false);
@@ -14,7 +16,7 @@
 		error = '';
 		try {
 			const token = await firebaseAuth.currentUser?.getIdToken(false);
-			const response = await fetch('https://getusers-joqt3ovt4q-ew.a.run.app', {
+			const response = await fetch(getFunctionUris($page.url.origin).getUsers, {
 				headers: { Authorization: `Bearer ${token}` }
 			});
 			const responseData = await response.json();

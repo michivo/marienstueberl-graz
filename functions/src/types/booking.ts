@@ -4,9 +4,14 @@ export type BookingStatus = 'confirmed' | 'pickedUp' | 'cancelled';
 
 export interface Booking {
     client: Client,
-    weekOf: Date,
-    date: Date,
+    weekOf: string,
+    date: string,
     startTime: string,
     endTime: string,
     status: BookingStatus,
+    pickUpDateTimeLocal?: string,
+}
+
+export interface BookingWithId extends Booking {
+    id: string,
 }

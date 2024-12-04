@@ -45,7 +45,7 @@ export async function logOut(): Promise<void> {
 firebaseAuth.languageCode = 'de';
 
 if (firebaseAuth.currentUser) {
-    await updateUser(firebaseAuth.currentUser);
+    updateUser(firebaseAuth.currentUser);
 }
 firebaseAuth.onAuthStateChanged(async (user) => {
     await updateUser(user);

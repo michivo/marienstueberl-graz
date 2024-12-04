@@ -1,6 +1,7 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, limit, query, updateDoc, where } from "firebase/firestore";
 import { firebaseDb } from "./firebase";
 import type { Client } from "../types/client";
+import type { User } from "firebase/auth";
 
 type ClientDoc = Partial<Client>;
 
@@ -20,6 +21,7 @@ export async function getClients() {
 
 export async function addClient(client: Client) {
     // TODO: validation    
+    // TODO: create a new user in firebase auth
     const database = firebaseDb;
 
     const clientDoc = client as ClientDoc;
@@ -28,8 +30,23 @@ export async function addClient(client: Client) {
     client.id = ref.id;
 }
 
+export async function getClient(user: User) : Promise<Client | undefined> {
+    const database = firebaseDb;
+    const clientsCollection = collection(database, collectionName);
+    const clientsQuery = query(clientsCollection, where('email', '==', user.email), limit(1));
+    const snapshot = await getDocs(clientsQuery);
+    if(snapshot.empty) {
+        return undefined;
+    }
+
+    const doc = snapshot.docs[0].data() as Client;
+    doc.id = snapshot.docs[0].id;
+    return doc;
+}
+
 export async function updateClient(client: Client) {
     // TODO: validation
+    // TODO: update user in firebase auth
     const database = firebaseDb;
     const id = client.id;
     const clientDoc = {...client as ClientDoc};
