@@ -8,6 +8,7 @@ export function getFunctionUris(baseUri: string) : FunctionUris {
             getUsers: 'http://127.0.0.1:5001/marienstueberl-graz/europe-west1/getUsers',
             cancelReservation: 'http://127.0.0.1:5001/marienstueberl-graz/europe-west1/cancelReservation',
             makeReservation: 'http://127.0.0.1:5001/marienstueberl-graz/europe-west1/makeReservation',
+            updateUserProfile: 'http://127.0.0.1:5001/marienstueberl-graz/europe-west1/updateUser',
         }
     }
     return {
@@ -16,5 +17,6 @@ export function getFunctionUris(baseUri: string) : FunctionUris {
         getUsers: 'https://getusers-joqt3ovt4q-ew.a.run.app',
         cancelReservation: 'https://cancelreservation-joqt3ovt4q-ew.a.run.app',
         makeReservation: 'https://makereservation-joqt3ovt4q-ew.a.run.app',
+        updateUserProfile: 'https://updateuser-joqt3ovt4q-ew.a.run.app',
     }
 }

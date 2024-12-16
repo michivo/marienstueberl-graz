@@ -4,4 +4,5 @@ export interface FunctionUris {
     getUsers: string,
     makeReservation: string,
     cancelReservation: string,
+    updateUserProfile: string,
 }

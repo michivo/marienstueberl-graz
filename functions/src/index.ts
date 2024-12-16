@@ -4,9 +4,10 @@ import { App, initializeApp } from 'firebase-admin/app';
 import { auth } from 'firebase-admin';
 import { Request, Response } from 'express';
 import { DecodedIdToken } from 'firebase-admin/auth';
-import { grantAdminRights } from './api/grantUserRights';
+import { updateUserRole } from './api/updateUserRole';
 import { doMakeReservation } from './api/makeReservation';
 import { doCancelReservation } from './api/cancelReservation';
+import { updateUserProfile } from './api/updateUserProfile';
 
 let app = undefined as App | undefined;
 
@@ -49,7 +50,7 @@ export const setIsAdmin = onRequest({ region: 'europe-west1', cors: ['*'] }, asy
     response.status(405).send('Method Not Allowed');
   }
   const decodedIdToken = await getToken(request, response);
-  await grantAdminRights(decodedIdToken, request, response, { admin: true });
+  await updateUserRole(decodedIdToken, request, response, { admin: true });
 });
 
 export const setIsPrivilegedUser = onRequest({ region: 'europe-west1', cors: ['*'] }, async (request, response) => {
@@ -57,7 +58,23 @@ export const setIsPrivilegedUser = onRequest({ region: 'europe-west1', cors: ['*
     response.status(405).send('Method Not Allowed');
   }
   const decodedIdToken = await getToken(request, response);
-  await grantAdminRights(decodedIdToken, request, response, { privilegedUser: true });
+  await updateUserRole(decodedIdToken, request, response, { privilegedUser: true });
+});
+
+export const setIsRegularUser = onRequest({ region: 'europe-west1', cors: ['*'] }, async (request, response) => {
+  if (request.method !== 'POST') {
+    response.status(405).send('Method Not Allowed');
+  }
+  const decodedIdToken = await getToken(request, response);
+  await updateUserRole(decodedIdToken, request, response, { });
+});
+
+export const updateUser = onRequest({ region: 'europe-west1', cors: ['*'] }, async (request, response) => {
+  if (request.method !== 'POST') {
+    response.status(405).send('Method Not Allowed');
+  }
+  const decodedIdToken = await getToken(request, response);
+  await updateUserProfile(decodedIdToken, request, response);  
 });
 
 export const getUsers = onRequest({ region: 'europe-west1', cors: ['*'] }, async (request, response) => {

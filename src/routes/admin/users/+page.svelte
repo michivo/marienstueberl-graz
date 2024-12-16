@@ -8,6 +8,7 @@
 	import { page } from '$app/stores';
 	import Modal from '../../../components/misc/Modal.svelte';
 	import AddUserModal from '../../../components/users/AddUserModal.svelte';
+	import EditUserModal from '../../../components/users/EditUserModal.svelte';
 
 	let users: UserAccount[] = $state([]);
 	let allUsers: UserAccount[] = $state([]);
@@ -15,6 +16,7 @@
 	let loading = $state(false);
 	let error = $state('');
 	let showAddModal = $state(false);
+	let showEditModal = $state(false);
 	let userAccount: UserAccount = $state(getEmptyAccount());
 
 	onMount(loadUsers);
@@ -22,16 +24,16 @@
 	function getEmptyAccount(): UserAccount {
 		return {
 			uid: '',
-    		email: '',
-    		displayName: '',
-    		metadata: {
-        		creationTime: '',
-        		lastSignInTime: '',
-    		},
-    		customClaims: {
-        		admin: false,
-        		privilegedUser: false
-    		}
+			email: '',
+			displayName: '',
+			metadata: {
+				creationTime: '',
+				lastSignInTime: ''
+			},
+			customClaims: {
+				admin: false,
+				privilegedUser: false
+			}
 		};
 	}
 
@@ -46,7 +48,9 @@
 			const responseData = await response.json();
 			users = responseData.users.filter((user: UserAccount) => !!user.customClaims);
 			allUsers = responseData.users;
-			unassignedUsers = allUsers.filter(u => !(u.customClaims?.admin || u.customClaims?.privilegedUser));
+			unassignedUsers = allUsers.filter(
+				(u) => !(u.customClaims?.admin || u.customClaims?.privilegedUser)
+			);
 		} catch (ex) {
 			if (ex instanceof Error) {
 				error = ex?.message ?? 'Unbekannter Fehler';
@@ -64,7 +68,11 @@
 		showAddModal = true;
 	}
 
-	function closeUserModal() {
+	function closeAddUserModal() {
+		showAddModal = false;
+	}
+
+	function closeEditUserModal() {
 		showAddModal = false;
 	}
 
@@ -72,45 +80,66 @@
 		showAddModal = false;
 		loading = true;
 		try {
-			if(newUser.customClaims?.admin) {
+			if (newUser.customClaims?.admin) {
 				await makeAdmin(newUser);
-			}
-			else if(newUser.customClaims?.privilegedUser) {
+			} else if (newUser.customClaims?.privilegedUser) {
 				await makePrivileged(newUser);
 			}
-			await new Promise(r => setTimeout(r, 2000)); 
+			await new Promise((r) => setTimeout(r, 5000));
 			await loadUsers();
-		}
-		finally {
+		} finally {
 			loading = false;
-		}		
+		}
 	}
 
-	
-    async function makePrivileged(user: UserAccount) {
-        const token = await firebaseAuth.currentUser?.getIdToken(false);
-        fetch(getFunctionUris($page.url.origin).setIsPrivilegedUser, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({ uid: user.uid })
-        });
-    }
+	async function makePrivileged(user: UserAccount) {
+		const token = await firebaseAuth.currentUser?.getIdToken(false);
+		fetch(getFunctionUris($page.url.origin).setIsPrivilegedUser, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
+			},
+			body: JSON.stringify({ uid: user.uid })
+		});
+	}
 
-	
-    async function makeAdmin(user: UserAccount) {
-        const token = await firebaseAuth.currentUser?.getIdToken(false);
-        fetch(getFunctionUris($page.url.origin).setIsAdmin, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({ uid: user.uid })
-        });
-    }
+	async function makeAdmin(user: UserAccount) {
+		const token = await firebaseAuth.currentUser?.getIdToken(false);
+		fetch(getFunctionUris($page.url.origin).setIsAdmin, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
+			},
+			body: JSON.stringify({ uid: user.uid })
+		});
+	}
+
+	async function updateUser(user: UserAccount) {
+		showAddModal = false;
+		loading = true;
+		try {
+			const token = await firebaseAuth.currentUser?.getIdToken(false);
+			fetch(getFunctionUris($page.url.origin).updateUserProfile, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				},
+				body: JSON.stringify(user),
+			});
+			await new Promise((r) => setTimeout(r, 5000));
+			await loadUsers();
+		} finally {
+			loading = false;
+		}
+	}
+
+	function onEditUser(user: UserAccount) {
+		userAccount = { ...user };
+		showEditModal = true;
+	}
 </script>
 
 <div>
@@ -120,14 +149,20 @@
 	{:else if error}
 		Fehler beim Laden der Benutzer:innendaten: {error}
 	{:else}
-		<UserList {users} />
+		<UserList {users} onEditUser={onEditUser} />
 		<button onclick={addUser} id="add-user">Benutzer:in hinzufügen</button>
 	{/if}
 	<Modal bind:showModal={showAddModal}>
 		{#snippet header()}
 			<h2>Benutzer:in hinzufügen</h2>
 		{/snippet}
-		<AddUserModal user={userAccount} users={unassignedUsers} {saveUser} {closeUserModal} />
+		<AddUserModal user={userAccount} users={unassignedUsers} {saveUser} closeModal={closeAddUserModal} />
+	</Modal>
+	<Modal bind:showModal={showEditModal}>
+		{#snippet header()}
+			<h2>Benutzer:in bearbeiten</h2>
+		{/snippet}
+		<EditUserModal user={userAccount} saveUser={updateUser} closeModal={closeEditUserModal} />
 	</Modal>
 </div>
 

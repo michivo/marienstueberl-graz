@@ -5,16 +5,12 @@
 	import IconButton from "../misc/IconButton.svelte";
     interface Props {
         users: UserAccount[];
+        onEditUser: (user: UserAccount) => void;
     }
 
-    let { users } : Props = $props();
+    let { users, onEditUser } : Props = $props();
 
     let loading = $state(false);
-
-	function onEditUser(user: UserAccount): void {
-		alert('Noch nicht implementiert');
-	}
-
 
 	function onDeleteUser(user: UserAccount): void {
 		alert('Noch nicht implementiert');

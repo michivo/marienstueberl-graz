@@ -5,8 +5,8 @@
 		user,
 		users,
 		saveUser,
-		closeUserModal
-	}: { user: UserAccount; users: UserAccount[]; saveUser: (c: UserAccount) => void; closeUserModal: () => void } =
+		closeModal
+	}: { user: UserAccount; users: UserAccount[]; saveUser: (c: UserAccount) => void; closeModal: () => void } =
 		$props();
 
     let isUserReady = $derived.by(() => {
@@ -21,7 +21,7 @@
 
     let availableUsers = $derived(users.filter(u => u.displayName && u.email));
 
-	function doSaveClient() {
+	function onSaveUser() {
 		const copy = { ...user };
 		saveUser(copy);
 	}
@@ -95,8 +95,8 @@
         <div class="user-info">
             Bevor Sie eine:n Benutzer:in als Admin oder Helfer:in hinzufügen können, muss sich die jeweilige Person einmal angemeldet haben (wird sich in Zukunft ändern).
         </div>
-	<button type="submit" onclick={doSaveClient} disabled={!isUserReady}>Speichern</button>
-	<button onclick={closeUserModal}>Abbrechen</button>
+	<button type="submit" onclick={onSaveUser} disabled={!isUserReady}>Speichern</button>
+	<button onclick={closeModal}>Abbrechen</button>
 </form>
 
 <style>
