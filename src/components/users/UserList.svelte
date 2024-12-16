@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { page } from "$app/stores";
-	import { firebaseAuth } from "../../services/firebase";
-	import { getFunctionUris } from "../../services/functionUris";
 	import type { UserAccount } from "../../types/userAccount";
 	import DeleteIcon from "../icons/DeleteIcon.svelte";
 	import EditIcon from "../icons/EditIcon.svelte";
@@ -14,26 +11,13 @@
 
     let loading = $state(false);
 
-    async function makePrivileged(user: UserAccount) {
-        const token = await firebaseAuth.currentUser?.getIdToken(false);
-        fetch(getFunctionUris($page.url.origin).setIsPrivilegedUser, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-            },
-            body: JSON.stringify({ uid: user.uid })
-        });
-    }
-
-
 	function onEditUser(user: UserAccount): void {
-		throw new Error("Function not implemented.");
+		alert('Noch nicht implementiert');
 	}
 
 
 	function onDeleteUser(user: UserAccount): void {
-		throw new Error("Function not implemented.");
+		alert('Noch nicht implementiert');
 	}
 </script>
 

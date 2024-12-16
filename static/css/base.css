@@ -25,6 +25,12 @@ button {
     border-radius: 0.25rem;
 }
 
+button:disabled, button[disabled] {
+    background-color: var(--secondary-light);
+    color: var(--secondary-dark);
+    cursor: not-allowed;
+}
+
 button.dark {
     border: 1px solid var(--light);
     background-color: var(--dark);
