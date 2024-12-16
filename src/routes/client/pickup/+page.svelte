@@ -79,6 +79,7 @@
 			<div class="client-name">{client.name}</div>
 			<div class="client-people">P: {client.peopleCount}, K: {client.childrenCount}</div>
 			<div class="client-expiry">Berechtigt bis {client.validThrough}</div>
+			<div class="client-issuer">Ausstellende Stelle: <span class="issuer">{client.issuer}</span></div>
 		</div>
 	{/if}
 	{#if pickupState.uri}
@@ -124,6 +125,15 @@
 		.client-expiry {
 			font-size: 0.9rem;
 			color: var(--secondary-dark);
+		}
+		
+		.client-issuer {
+			font-size: 0.9rem;
+			color: black;
+
+			.issuer {
+				font-weight: 700;
+			}
 		}
 	}
 

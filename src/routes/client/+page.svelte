@@ -1,17 +1,3 @@
-<script lang="ts">
-	import { onMount } from 'svelte';
-
-	let data = '';
-	let state = 'valid' as 'valid' | 'invalid' | 'upcoming';
-
-	onMount(() => {
-		const urlParams = new URLSearchParams(window.location.search);
-		const baseUrl = window.location.origin;
-		state = (urlParams.get('state') as 'valid' | 'invalid' | 'upcoming') || 'valid';
-		data = baseUrl + '/handout/' + state + '.html';
-	});
-</script>
-
 <div class="container">
     <a href="/client/reservation">Termin reservieren</a>
     <a href="/client/pickup">Abholen</a>
@@ -36,7 +22,7 @@
         cursor: pointer;
         border: 1px solid black;
         border-radius: 0.25rem;
-        box-shadow: 1px 1px 2px var(--highlight-red);
+        box-shadow: 1px 1px 2px var(#000);
         width: 25rem;
         text-align: center;
         max-width: 100%;

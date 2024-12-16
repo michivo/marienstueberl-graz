@@ -6,4 +6,5 @@ export interface Client {
     peopleCount: number;
     childrenCount: number;
     validThrough: Date;
+    issuer: string;
 }

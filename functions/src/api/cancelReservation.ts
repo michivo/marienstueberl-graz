@@ -51,7 +51,8 @@ async function getClient(firebaseDb: Firestore, decodedIdToken: DecodedIdToken):
         name: client.name,
         peopleCount: client.peopleCount,
         userUid: client.userUid,
-        validThrough: client.validThrough
+        validThrough: client.validThrough,
+        issuer: client.issuer,
     };
     return clientDoc;
 }

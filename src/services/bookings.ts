@@ -61,7 +61,7 @@ export async function markBookingAsPickedUp(bookingId: string) {
     const database = firebaseDb;
     const bookingCollection = collection(database, collectionName);
     const reference = doc(bookingCollection, bookingId);
-    await updateDoc(reference, { status: 'pickedUp' });
+    await updateDoc(reference, { status: 'pickedUp', pickUpDateTimeLocal: new Date().toISOString() });
 }
 
 export async function getBookingById(bookingId: string) {

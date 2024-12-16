@@ -20,7 +20,7 @@
 				headers: { Authorization: `Bearer ${token}` }
 			});
 			const responseData = await response.json();
-			users = responseData.users;
+			users = responseData.users.filter((user: UserAccount) => !!user.customClaims);
 		} catch (ex) {
 			if (ex instanceof Error) {
 				error = ex?.message ?? 'Unbekannter Fehler';
@@ -39,7 +39,7 @@
 	{#if loading}
 		<Spinner />
 	{:else if error}
-		Fehler beim Laden der Benutzer:innendaten: {{ error }}
+		Fehler beim Laden der Benutzer:innendaten: { error }
 	{:else}
 		<UserList {users} />
 	{/if}

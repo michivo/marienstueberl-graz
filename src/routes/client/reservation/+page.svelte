@@ -21,7 +21,7 @@
 	let configuration = $state<DistributionConfig | undefined>(undefined);
 	let loading = $state(false);
 
-	const hasAnyReservation = $derived(() => bookings.find(
+	const hasAnyReservation = $derived.by(() => bookings.find(
 			(b) => b.client.email === firebaseAuth.currentUser?.email
 		)
 	);

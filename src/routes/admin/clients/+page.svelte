@@ -38,7 +38,8 @@
 			email: '',
 			peopleCount: 0,
 			childrenCount: 0,
-			validThrough: new Date()
+			validThrough: new Date(),
+			issuer: ''
 		};
 	}
 
@@ -99,6 +100,10 @@
 			loading = false;
 		}
 	}
+
+	function isInvalid(client: Client) {
+		return new Date(client.validThrough) < new Date();
+	}
 </script>
 
 <div>
@@ -110,16 +115,18 @@
 					<th>Email</th>
 					<th>Personen/Kinder</th>
 					<th>Berechtigt bis</th>
+					<th>Ausstellende St.</th>
 					<th>Aktionen</th>
 				</tr>
 			</thead>
 			<tbody>
 				{#each clients as client}
-					<tr>
+					<tr class:invalid={isInvalid(client)}>
 						<td>{client.name}</td>
 						<td>{client.email}</td>
 						<td>{client.peopleCount}/{client.childrenCount}</td>
 						<td>{client.validThrough}</td>
+						<td>{client.issuer}</td>
 						<td class="actions-cell">
 							<IconButton disabled={ loading } on:click={() => onEditClient(client)}><EditIcon /></IconButton>
 							<IconButton disabled={ loading } on:click={() => onDeleteClient(client)}><DeleteIcon /></IconButton>
@@ -184,6 +191,11 @@
 					display: flex;
 					gap: 1rem;
 				}
+			}
+
+			tr.invalid {
+				background-color: var(--secondary-light);
+				color: var(--secondary-dark);
 			}
 		}
 	}
