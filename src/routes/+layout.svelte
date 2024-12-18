@@ -36,7 +36,7 @@
 
 		a {
 			text-transform: uppercase;
-			color: var(--dark);
+			color: var(--secondary-dark);
 		}
 	}
 </style>
