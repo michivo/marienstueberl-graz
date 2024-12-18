@@ -3,7 +3,7 @@
 }
 
 :root {
-    --highlight-red: #e40428;
+    --highlight-red: #940320; /* #e40428; */
     --light: #fff;
     --dark: #000;
     --secondary-dark: #555;

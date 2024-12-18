@@ -1,7 +1,7 @@
 <script>
 	import { currentUser } from '../../stores/currentUser';
 	import { logOut } from '../../services/firebase';
-	import CaritasIcon from '../icons/CaritasIcon.svelte';
+	import SoupIcon from '../icons/SoupIcon.svelte';
 	import HomeIcon from '../icons/HomeIcon.svelte';
 </script>
 
@@ -10,7 +10,7 @@
     <div class="logo">
         <a href="..">
         <div class="large-logo">
-            <CaritasIcon />
+            <SoupIcon />
         </div>
         <div class="small-logo">
             <HomeIcon />

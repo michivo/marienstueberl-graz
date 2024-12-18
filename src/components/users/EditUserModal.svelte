@@ -80,10 +80,4 @@
             margin-top: 0.5rem;
         }
     }
-
-    div.user-info {
-        font-size: 0.9rem;
-        font-weight: 300;
-        padding: 1rem;
-    }
 </style>

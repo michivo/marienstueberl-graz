@@ -16,6 +16,9 @@
 		<LoadingHeader />
 	{/if}
 	<slot></slot>
+	<footer>
+		<a href="/imprint">Impressum</a>
+	</footer>
 </div>
 
 <style>
@@ -23,5 +26,17 @@
 		min-height: 100dvh;
 		display: flex;
 		flex-direction: column;
+	}
+
+	footer {
+		border-top: 1px solid #ccc;
+		display: flex;
+		justify-content: center;
+		padding: 0.25rem;
+
+		a {
+			text-transform: uppercase;
+			color: var(--dark);
+		}
 	}
 </style>

@@ -1,11 +1,11 @@
 <script>
-	import CaritasIcon from "../icons/CaritasIcon.svelte";
+	import SoupIcon from "../icons/SoupIcon.svelte";
 
 </script>
 
 <header>
 	<span>Bitte melden Sie sich an</span>
-    <CaritasIcon />
+    <SoupIcon />
 </header>
 
 <style lang="scss" scoped>
