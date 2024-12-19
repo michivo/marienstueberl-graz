@@ -18,7 +18,7 @@
 		"@playwright/test": "^1.49.1",
 		"@sveltejs/adapter-auto": "^3.3.1",
 		"@sveltejs/adapter-static": "^3.0.6",
-		"@sveltejs/kit": "^2.0.0",
+		"@sveltejs/kit": "^2.12.2",
 		"@sveltejs/vite-plugin-svelte": "^5.0.3",
 		"@types/eslint": "^9.6.0",
 		"eslint": "^9.0.0",
@@ -37,7 +37,7 @@
 	"type": "module",
 	"dependencies": {
 		"@castlenine/svelte-qrcode": "^2.3.0",
-		"firebase": "^10.14.1",
+		"firebase": "^11.1.0",
 		"firebaseui": "^6.1.0"
 	}
 }
